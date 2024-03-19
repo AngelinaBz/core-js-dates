@@ -197,8 +197,19 @@ function getCountWeekendsInMonth(month, year) {
  * Date(2024, 0, 31) => 5
  * Date(2024, 1, 23) => 8
  */
-function getWeekNumberByDate(/* date */) {
-  throw new Error('Not implemented');
+function getWeekNumberByDate(date) {
+  const year = new Date(date).getFullYear();
+  let firstDay = new Date(year, 0, 1).getDay();
+  let count = 1;
+
+  if (!firstDay) firstDay = 7;
+  const week = 7 - firstDay + 1;
+
+  while (date > new Date(year, 0, week)) {
+    if (date.getDay() === 1) count += 1;
+    date.setDate(date.getDate() - 1);
+  }
+  return count;
 }
 
 /**
@@ -253,8 +264,34 @@ function getQuarter(date) {
  * { start: '01-01-2024', end: '15-01-2024' }, 1, 3 => ['01-01-2024', '05-01-2024', '09-01-2024', '13-01-2024']
  * { start: '01-01-2024', end: '10-01-2024' }, 1, 1 => ['01-01-2024', '03-01-2024', '05-01-2024', '07-01-2024', '09-01-2024']
  */
-function getWorkSchedule(/* period, countWorkDays, countOffDays */) {
-  throw new Error('Not implemented');
+function getWorkSchedule(period, countWorkDays, countOffDays) {
+  const startDate = new Date(period.start.split('-').reverse().join('/'));
+  const endDate = new Date(period.end.split('-').reverse().join('/'));
+  const schedule = [];
+  const currentDate = new Date(startDate);
+
+  while (currentDate <= new Date(endDate)) {
+    for (
+      let i = 0;
+      i < countWorkDays && currentDate <= new Date(endDate);
+      i += 1
+    ) {
+      schedule.push(
+        `${currentDate.getDate().toString().padStart(2, '0')}-${(currentDate.getMonth() + 1).toString().padStart(2, '0')}-${currentDate.getFullYear()}`
+      );
+      currentDate.setDate(currentDate.getDate() + 1);
+    }
+
+    for (
+      let i = 0;
+      i < countOffDays && currentDate <= new Date(endDate);
+      i += 1
+    ) {
+      currentDate.setDate(currentDate.getDate() + 1);
+    }
+  }
+
+  return schedule;
 }
 
 /**
